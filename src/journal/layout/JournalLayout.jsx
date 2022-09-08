@@ -12,6 +12,7 @@ export const JournalLayout = ({ children }) => {
         
         <Box 
             component='main'
+            className='animate__animated animate__fadeIn animate__faster'
             sx={{ flexGrow: 1, p: 3}}
         >
             <Toolbar />
