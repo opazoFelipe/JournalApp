@@ -46,4 +46,20 @@
         ],
         "description": "UseDispatch snippet custom para la App"
     },
+    "UseSelector snippet": {
+        "prefix": "redux-useSelector",
+        "body": [
+            "const {${2:attributes}} = useSelector( state => state.${1:selectorName})"
+        ],
+        "description": "UseSelector snippet custom para la App"
+    },
+    "Crea un reducer para el store": {
+        "prefix": "redux-reducer-store",
+        "body": [
+            "${1:nombreReducer}: (${2:state}, ${3:action}) => {",
+            "",   
+            "}"
+        ],
+        "description": "Crear function para key de objeto"
+    },
 }
