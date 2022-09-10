@@ -1,11 +1,11 @@
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Grid, Typography, Button, TextField } from "@mui/material"
-import { SaveOutlined } from "@mui/icons-material"
+import { Grid, Typography, Button, TextField, IconButton } from "@mui/material"
+import { SaveOutlined, UploadOutlined, DeleteOutlined } from "@mui/icons-material"
 
 import { ImageGallery } from '../components'
 import { useForm } from '../../hooks'
-import { setActiveNote, startSaveNote } from "../../store"
+import { setActiveNote, startSaveNote, startUploadingFiles, startDeletingNote } from "../../store"
 import Swal from "sweetalert2"
 import 'sweetalert2/dist/sweetalert2.css'
 
@@ -13,7 +13,7 @@ export const NoteView = () => {
 
     const dispatch = useDispatch()
 
-    const { active:note, messageSaved, isSaving } = useSelector( state => state.journal )
+    const { active: note, messageSaved, isSaving } = useSelector(state => state.journal)
 
     const { body, title, onInputChange, date, formState } = useForm(note)
 
@@ -22,8 +22,10 @@ export const NoteView = () => {
         return newDate.toUTCString()
     })
 
+    const fileInputRef = useRef()
+
     useEffect(() => {
-        dispatch( setActiveNote(formState) )
+        dispatch(setActiveNote(formState))
     }, [formState])
 
     useEffect(() => {
@@ -31,12 +33,22 @@ export const NoteView = () => {
             Swal.fire('Nota Actualizada', messageSaved, 'success')
         }
     }, [messageSaved])
-    
 
-    const onSaveNote = () => { 
+
+    const onSaveNote = () => {
         dispatch(startSaveNote())
     }
-    
+
+    const onFileInputChange = ({ target }) => {
+        if (target.files === 0) return
+
+        dispatch(startUploadingFiles(target.files))
+    }
+
+    const onDelete = () => {
+        dispatch( startDeletingNote() )
+    }
+
     return (
         <Grid container
             className='animate__animated animate__fadeIn animate__faster'
@@ -47,27 +59,43 @@ export const NoteView = () => {
         >
             <Grid item>
                 <Typography
-                    fontSize={ 39 }
+                    fontSize={39}
                     fontWeight='light'
                 >
-                    { dateString }
+                    {dateString}
                 </Typography>
             </Grid>
 
             <Grid item>
-                <Button 
-                    disabled={ isSaving } 
-                    onClick={ onSaveNote }
+                <input
+                    type="file"
+                    multiple
+                    ref={fileInputRef}
+                    onChange={onFileInputChange}
+                    hidden
+                />
+
+                <IconButton
+                    color="primary"
+                    disabled={isSaving}
+                    onClick={() => fileInputRef.current.click()}
+                >
+                    <UploadOutlined />
+                </IconButton>
+
+                <Button
+                    disabled={isSaving}
+                    onClick={onSaveNote}
                     color="primary"
                     sx={{ padding: 2 }}
                 >
-                    <SaveOutlined sx={{ fontSize: 30, mr: 1}} />
+                    <SaveOutlined sx={{ fontSize: 30, mr: 1 }} />
                     Guardar
                 </Button>
             </Grid>
 
             <Grid container>
-                <TextField 
+                <TextField
                     type="text"
                     variant="filled"
                     fullWidth
@@ -76,25 +104,36 @@ export const NoteView = () => {
                     sx={{ border: 'none', mb: 1 }}
                     name="title"
                     value={title}
-                    onChange={ onInputChange }
+                    onChange={onInputChange}
                 />
 
-                <TextField 
+                <TextField
                     type="text"
                     variant="filled"
                     fullWidth
                     multiline
                     placeholder="¿Qué sucedió el día de hoy?"
-                    minRows={ 5 }
+                    minRows={5}
                     name="body"
                     value={body}
-                    onChange={ onInputChange }
+                    onChange={onInputChange}
                 />
             </Grid>
 
+            <Grid container justifyContent='end'>
+                <Button
+                    onClick={onDelete}
+                    sx={{ mt: 2 }}
+                    color="error"
+                >
+                    <DeleteOutlined />
+                    Borrar
+                </Button>
+            </Grid>
+
             {/* Image gallery */}
-            <ImageGallery />
-            
+            <ImageGallery images={note.imageUrls} />
+
         </Grid>
     )
 }

@@ -1,14 +1,24 @@
+import { useDispatch, useSelector } from 'react-redux'
 import { IconButton } from '@mui/material'
 import { AddOutlined } from '@mui/icons-material'
 import { JournalLayout } from '../layout/JournalLayout'
 import { NothingSelectedView, NoteView } from '../views'
-import { useDispatch, useSelector } from 'react-redux'
 import { startNewNote } from '../../store'
+
+import Swal from "sweetalert2"
+import 'sweetalert2/dist/sweetalert2.css'
+import { useEffect } from 'react'
 
 export const JournalPage = () => {
 
     const dispatch = useDispatch()
-    const { isSaving, active } = useSelector( state => state.journal )
+    const { isSaving, active, messageSaved } = useSelector( state => state.journal )
+
+    useEffect(() => {
+        if (messageSaved.length > 0) {
+            Swal.fire('Nota Actualizada', messageSaved, 'success')
+        }
+    }, [messageSaved])
 
     const onClickNewNote = () => {
         dispatch( startNewNote() )
