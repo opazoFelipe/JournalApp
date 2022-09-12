@@ -1,4 +1,5 @@
 {
     "editor.wordWrap": "on",
-    "winopacity.opacity": 250,
+    "winopacity.opacity": 252,
+    "workbench.colorTheme": "Codex Effect"
 }
